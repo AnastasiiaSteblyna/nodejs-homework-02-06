@@ -1,4 +1,3 @@
-// const fs = require('fs/promises')
 const path = require("path");
 const fs = require("fs").promises;
 const { randomBytes } = require("node:crypto");
