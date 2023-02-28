@@ -40,11 +40,11 @@ router.post("/", async (req, res, next) => {
 
 router.delete("/:contactId", async (req, res, next) => {
   try {
-    const contacId = await contacts.removeContact(req.params.contactId);
-    if (!contacId) {
+    const removedContact = await contacts.removeContact(req.params.contactId);
+    if (!removedContact) {
       return res.status(404).json({ message: "Not found" });
     }
-    res.status(200).json({ contacId, message: "contact deleted" });
+    res.status(200).json({ removedContact, message: "contact deleted" });
   } catch (error) {
     next(error);
   }
@@ -78,9 +78,11 @@ router.patch("/:contactId/favorite", async (req, res, next) => {
       contactId,
       req.body
     );
-
+    if (!req.body) {
+      return res.status(400).json({ message: "missing field favorite" });
+    }
     if (!patchContact) {
-      return res.status(404).json({ message: "missing field favorite" });
+      return res.status(404).json({ message: "not found" });
     }
 
     res.status(200).json({ patchContact });

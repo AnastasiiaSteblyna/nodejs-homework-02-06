@@ -11,7 +11,7 @@ const getContactById = async (contactId) => {
 };
 
 const removeContact = async (contactId) => {
-  const removedContacts = Contact.findByIdAndRemove(contactId);
+  const removedContacts = await Contact.findByIdAndRemove(contactId);
   return removedContacts;
 };
 
@@ -22,11 +22,12 @@ const addContact = async (body) => {
 };
 
 const updateContact = async (contactId, body) => {
-  const { name, email, phone } = body;
+  const { name, email, phone, favorite } = body;
   const contact = await Contact.findByIdAndUpdate(contactId, {
     name,
     email,
     phone,
+    favorite,
   });
   return contact;
 };
