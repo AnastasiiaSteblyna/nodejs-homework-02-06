@@ -1,4 +1,3 @@
-const { boolean } = require("joi");
 const Joi = require("joi");
 
 const schema = Joi.object({
