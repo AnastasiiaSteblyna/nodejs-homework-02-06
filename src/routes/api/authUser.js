@@ -29,7 +29,8 @@ const login = async ({ email, password }) => {
       _id: user._id,
       email: user.email,
     },
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
+    { expiresIn: "23h" }
   );
   await User.findByIdAndUpdate(user._id, { token });
   return { token, user };

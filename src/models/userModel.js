@@ -22,7 +22,7 @@ const userShema = new mongoose.Schema(
       default: null,
     },
   },
-  { versionkey: false, timestamps: true }
+  { versionKey: false, timestamps: true }
 );
 
 userShema.pre("save", async function () {
