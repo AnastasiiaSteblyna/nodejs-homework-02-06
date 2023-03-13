@@ -39,8 +39,8 @@ router.post("/", contactValidation, async (req, res, next) => {
   try {
     const post = req.body;
     const { _id: owner } = req.user;
-    const postContac = await contacts.addContact(post, owner);
-    res.status(201).json({ postContac });
+    const postedContact = await contacts.addContact(post, owner);
+    res.status(201).json({ postedContact });
   } catch (error) {
     next(error);
   }
@@ -50,12 +50,11 @@ router.delete("/:contactId", async (req, res, next) => {
   try {
     const postId = req.params.contactId;
     const { _id: owner } = req.user;
-    const contacId = await contacts.removeContact(postId, owner);
-    if (!contacId) {
+    const deletedContact = await contacts.removeContact(postId, owner);
+    if (!deletedContact) {
       return res.status(404).json({ message: "Not found" });
     }
-
-    res.status(200).json({ contacId, message: "contact deleted" });
+    res.status(200).json({ deletedContact, message: "contact deleted" });
   } catch (error) {
     next(error);
   }
@@ -71,7 +70,6 @@ router.put("/:contactId", contactValidation, async (req, res, next) => {
     if (changes === null) {
       return res.status(404).json({ message: "Not found" });
     }
-
     res.status(200).json({ changes, message: "template message put" });
   } catch (error) {
     next(error);
