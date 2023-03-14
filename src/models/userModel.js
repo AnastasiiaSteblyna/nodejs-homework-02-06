@@ -21,8 +21,11 @@ const userShema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    avatarUrl: {
+      type: String,
+    },
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false }
 );
 
 userShema.pre("save", async function () {
