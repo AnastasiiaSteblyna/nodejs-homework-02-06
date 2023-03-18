@@ -1,17 +1,21 @@
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const bcrypt = require("bcrypt");
-
+require("dotenv").config();
 const path = require("path");
 const fs = require("fs/promises");
 const Jimp = require("jimp");
+const sha256 = require("sha256");
+const sgMail = require("@sendgrid/mail");
 
-require("dotenv").config();
+sgMail.setApiKey(process.env.API_TOKEN);
 
 const { User } = require("../../models/userModel");
 const {
   RegistrationConflictError,
   UnauthorizedError,
+  NotFound,
+  AuthorizationError,
 } = require("../../helpers/errors");
 
 const signup = async ({ email, password }) => {
@@ -22,12 +26,59 @@ const signup = async ({ email, password }) => {
     throw new RegistrationConflictError(`Email ${email} in use`);
   }
 
-  const user = new User({ email, password, avatarURL: avatar });
+  const code = sha256(email + process.env.JWT_SECRET);
+
+  const user = new User({
+    email,
+    password,
+    avatarURL: avatar,
+    verificationToken: code,
+  });
+
+  const emailMessage = {
+    to: email,
+    from: "zanegina93@gmail.com",
+    subject: "Please, confirm your email",
+    text: `Please, confirm your email address POST http://localhost:8088/api/users/verify/${code} `,
+    html: `Please, confirm your email address POST http://localhost:8088/api/users/verify/${code} `,
+  };
+
+  await sgMail.send(emailMessage);
+
   return await user.save();
+};
+
+const verificationUser = async (verificationToken) => {
+  const user = await User.findOne({ verificationToken, verify: false });
+
+  if (!user) {
+    throw new NotFound(`User not found`);
+  }
+
+  user.verify = true;
+  user.verificationToken = "null";
+  await user.save();
+
+  const emailMessage = {
+    to: user.email,
+    from: "zanegina93@gmail.com",
+    subject: "Thank you, for registration!",
+    text: `Verification successful `,
+    html: `Verification successful `,
+  };
+
+  await sgMail.send(emailMessage);
 };
 
 const login = async ({ email, password }) => {
   const user = await User.findOne({ email });
+
+  console.log(user.verify);
+
+  if (user.verify === false) {
+    throw new AuthorizationError(`Not authorized`);
+  }
+
   if (!user || !(await bcrypt.compare(password, user.password))) {
     throw new UnauthorizedError(`Email or password is wrong`);
   }
@@ -73,10 +124,38 @@ const updateAvatar = async (file, userId) => {
   return publicPath;
 };
 
+const reVerification = async (email) => {
+  const user = await User.findOne({ email });
+
+  console.log(user);
+
+  if (user === null) {
+    throw new AuthorizationError(`missing required field email`);
+  }
+
+  if (user.verify === true) {
+    throw new AuthorizationError(`Verification has already been passed`);
+  }
+
+  const code = sha256(email + process.env.JWT_SECRET);
+
+  const emailMessage = {
+    to: email,
+    from: "dimasoroka17@gmail.com",
+    subject: "Please, confirm your email",
+    text: `Please, confirm your email address POST http://localhost:8088/api/users/verify/${code} `,
+    html: `Please, confirm your email address POST http://localhost:8088/api/users/verify/${code} `,
+  };
+
+  await sgMail.send(emailMessage);
+};
+
 module.exports = {
   signup,
   login,
   current,
   logout,
   updateAvatar,
+  verificationUser,
+  reVerification,
 };

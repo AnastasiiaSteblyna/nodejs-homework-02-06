@@ -18,7 +18,6 @@ app.use("/api/users", usersRouter);
 
 app.use("/api/contacts", contactsRouter);
 
-// POST localhost:8088/api/users/avatars
 app.use("/avatars", express.static("public"));
 
 app.use(errorHandler);

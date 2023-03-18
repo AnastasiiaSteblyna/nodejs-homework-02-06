@@ -1,11 +1,9 @@
 const express = require("express");
-
+const router = express.Router();
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const { upload } = require("../middlewares/avatarMiddleware");
 const { userValidation } = require("../middlewares/validation");
 const authUser = require("./api/authUser");
-
-const router = express.Router();
 
 router.post("/signup", userValidation, async (req, res, next) => {
   try {
@@ -29,9 +27,7 @@ router.post("/login", userValidation, async (req, res, next) => {
   }
 });
 
-router.use(authMiddleware);
-
-router.get("/current", async (req, res, next) => {
+router.get("/current", authMiddleware, async (req, res, next) => {
   try {
     const { email, subscription } = await authUser.current(req.user);
     res.status(200).json({ email, subscription });
@@ -40,7 +36,7 @@ router.get("/current", async (req, res, next) => {
   }
 });
 
-router.get("/logout", async (req, res, next) => {
+router.get("/logout", authMiddleware, async (req, res, next) => {
   try {
     const { _id } = req.user;
     const { email, subscription } = await authUser.logout(_id);
@@ -64,5 +60,33 @@ router.patch(
     }
   }
 );
+
+router.post("/verify/:verificationToken", async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+    await authUser.verificationUser(verificationToken);
+    res.status(200).json({
+      ResponseBody: {
+        message: `Verification successful`,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/verify", async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    await authUser.reVerification(email);
+    res.status(200).json({
+      ResponseBody: {
+        message: `Verification email sent`,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;
