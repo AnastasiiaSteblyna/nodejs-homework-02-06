@@ -21,7 +21,7 @@ const userShema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    avatarUrl: {
+    avatarURL: {
       type: String,
     },
     verify: {

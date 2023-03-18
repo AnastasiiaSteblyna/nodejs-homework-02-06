@@ -2,6 +2,7 @@ const {
   AuthorizationError,
   RegistrationConflictError,
   UnauthorizedError,
+  NotFound,
 } = require("../helpers/errors");
 
 const errorHandler = (error, req, res, next) => {

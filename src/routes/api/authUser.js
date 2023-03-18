@@ -49,8 +49,10 @@ const signup = async ({ email, password }) => {
 };
 
 const verificationUser = async (verificationToken) => {
-  const user = await User.findOne({ verificationToken, verify: false });
-
+  const user = await User.findOne({
+    verificationToken,
+    verify: false,
+  });
   if (!user) {
     throw new NotFound(`User not found`);
   }
@@ -141,7 +143,7 @@ const reVerification = async (email) => {
 
   const emailMessage = {
     to: email,
-    from: "dimasoroka17@gmail.com",
+    from: "zanegina93@gmail.com",
     subject: "Please, confirm your email",
     text: `Please, confirm your email address POST http://localhost:8088/api/users/verify/${code} `,
     html: `Please, confirm your email address POST http://localhost:8088/api/users/verify/${code} `,
