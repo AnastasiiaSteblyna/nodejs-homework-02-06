@@ -23,13 +23,13 @@ router.get("/:contactId", async (req, res, next) => {
   try {
     const postId = req.params.contactId;
     const { _id: owner } = req.user;
-    const contacId = await contacts.getContactById(postId, owner);
+    const contact = await contacts.getContactById(postId, owner);
 
-    if (!contacId) {
+    if (!contact) {
       return res.status(404).json({ message: "Not found" });
     }
 
-    res.status(200).json({ contacId });
+    res.status(200).json({ contact });
   } catch (error) {
     next(error);
   }
