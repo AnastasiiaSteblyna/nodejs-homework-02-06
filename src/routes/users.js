@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const { upload } = require("../middlewares/avatarMiddleware");
 const { userValidation } = require("../middlewares/validation");
@@ -61,7 +62,7 @@ router.patch(
   }
 );
 
-router.post("/verify/:verificationToken", async (req, res, next) => {
+router.get("/verify/:verificationToken", async (req, res, next) => {
   try {
     const { verificationToken } = req.params;
     await authUser.verificationUser(verificationToken);

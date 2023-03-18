@@ -23,7 +23,7 @@ const signup = async ({ email, password }) => {
   const avatar = gravatar.url(email, { protocol: "http" });
 
   if (emailUsers !== null) {
-    throw new RegistrationConflictError(`Email ${email} in use`);
+    throw new RegistrationConflictError(`Email ${email} is already in use`);
   }
 
   const code = sha256(email + process.env.JWT_SECRET);
